@@ -7,22 +7,30 @@ import {DiffChecker} from './DiffChecker'
 
 type GitHubClient = ReturnType<typeof github.getOctokit>
 
+interface PullRequestPayload {
+  base: {ref: string}
+  head: {ref: string}
+}
+
 async function run(): Promise<void> {
   try {
     const repoName = github.context.repo.repo
     const repoOwner = github.context.repo.owner
     const commitSha = github.context.sha
     const githubToken = core.getInput('accessToken')
-    const fullCoverage = JSON.parse(core.getInput('fullCoverageDiff'))
+    const fullCoverage = core.getInput('fullCoverageDiff') === 'true'
     const commandToRun = core.getInput('runCommand')
     const commandAfterSwitch = core.getInput('afterSwitchCommand')
     const delta = Number(core.getInput('delta'))
     const rawTotalDelta = core.getInput('total_delta')
     const githubClient = github.getOctokit(githubToken)
     const prNumber = github.context.issue.number
-    const branchNameBase = github.context.payload.pull_request?.base.ref
-    const branchNameHead = github.context.payload.pull_request?.head.ref
-    const useSameComment = JSON.parse(core.getInput('useSameComment'))
+    const pullRequest = github.context.payload.pull_request as
+      | PullRequestPayload
+      | undefined
+    const branchNameBase = pullRequest?.base.ref
+    const branchNameHead = pullRequest?.head.ref
+    const useSameComment = core.getInput('useSameComment') === 'true'
     const commentIdentifier = `<!-- codeCoverageDiffComment -->`
     const deltaCommentIdentifier = `<!-- codeCoverageDeltaComment -->`
     let totalDelta = null
@@ -160,4 +168,4 @@ async function findComment(
   return null
 }
 
-run()
+void run()
