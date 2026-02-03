@@ -43,24 +43,20 @@ export class DiffChecker {
   }
 
   getCoverageDetails(diffOnly: boolean, currentDirectory: string): string[] {
-    const keys = Object.keys(this.diffCoverageReport)
     const returnStrings: string[] = []
-    for (const key of keys) {
-      if (this.compareCoverageValues(this.diffCoverageReport[key]) !== 0) {
+    for (const [key, data] of Object.entries(this.diffCoverageReport)) {
+      if (this.compareCoverageValues(data) !== 0) {
         returnStrings.push(
-          this.createDiffLine(
-            key.replace(currentDirectory, ''),
-            this.diffCoverageReport[key]
-          )
+          this.createDiffLine(key.replace(currentDirectory, ''), data)
         )
       } else {
         if (!diffOnly) {
           returnStrings.push(
             `${key.replace(currentDirectory, '')} | ${
-              this.diffCoverageReport[key].statements.newPct
-            } | ${this.diffCoverageReport[key].branches.newPct} | ${
-              this.diffCoverageReport[key].functions.newPct
-            } | ${this.diffCoverageReport[key].lines.newPct}`
+              data.statements.newPct
+            } | ${data.branches.newPct} | ${
+              data.functions.newPct
+            } | ${data.lines.newPct}`
           )
         }
       }
@@ -72,15 +68,18 @@ export class DiffChecker {
     delta: number,
     totalDelta: number | null
   ): boolean {
-    const files = Object.keys(this.diffCoverageReport)
-    for (const file of files) {
-      const diffCoverageData = this.diffCoverageReport[file]
-      const keys: ('lines' | 'statements' | 'branches' | 'functions')[] = <
-        ('lines' | 'statements' | 'branches' | 'functions')[]
-      >Object.keys(diffCoverageData)
+    for (const [file, diffCoverageData] of Object.entries(
+      this.diffCoverageReport
+    )) {
+      const keys: ('lines' | 'statements' | 'branches' | 'functions')[] = [
+        'lines',
+        'statements',
+        'branches',
+        'functions'
+      ]
       // No new coverage found so that means we deleted a file coverage
       const fileRemovedCoverage = Object.values(diffCoverageData).every(
-        coverageData => coverageData.newPct === 0
+        (coverageData: DiffCoverageData) => coverageData.newPct === 0
       )
       if (fileRemovedCoverage) {
         core.info(
@@ -90,13 +89,12 @@ export class DiffChecker {
         continue
       }
       for (const key of keys) {
-        if (diffCoverageData[key].oldPct !== diffCoverageData[key].newPct) {
+        const coverageForKey = diffCoverageData[key]
+        if (coverageForKey.oldPct !== coverageForKey.newPct) {
           const deltaToCompareWith =
             file === 'total' && totalDelta !== null ? totalDelta : delta
-          if (
-            -this.getPercentageDiff(diffCoverageData[key]) > deltaToCompareWith
-          ) {
-            const percentageDiff = this.getPercentageDiff(diffCoverageData[key])
+          if (-this.getPercentageDiff(coverageForKey) > deltaToCompareWith) {
+            const percentageDiff = this.getPercentageDiff(coverageForKey)
             core.info(
               `percentage Diff: ${percentageDiff} is greater than delta for ${file}`
             )
@@ -115,11 +113,11 @@ export class DiffChecker {
   ): string {
     // No old coverage found so that means we added a new file coverage
     const fileNewCoverage = Object.values(diffFileCoverageData).every(
-      coverageData => coverageData.oldPct === 0
+      (coverageData: DiffCoverageData) => coverageData.oldPct === 0
     )
     // No new coverage found so that means we deleted a file coverage
     const fileRemovedCoverage = Object.values(diffFileCoverageData).every(
-      coverageData => coverageData.newPct === 0
+      (coverageData: DiffCoverageData) => coverageData.newPct === 0
     )
     if (fileNewCoverage) {
       return ` ${newCoverageIcon} | **${name}** | **${diffFileCoverageData.statements.newPct}** | **${diffFileCoverageData.branches.newPct}** | **${diffFileCoverageData.functions.newPct}** | **${diffFileCoverageData.lines.newPct}**`
@@ -142,9 +140,12 @@ export class DiffChecker {
   private compareCoverageValues(
     diffCoverageData: DiffFileCoverageData
   ): number {
-    const keys: ('lines' | 'statements' | 'branches' | 'functions')[] = <
-      ('lines' | 'statements' | 'branches' | 'functions')[]
-    >Object.keys(diffCoverageData)
+    const keys: ('lines' | 'statements' | 'branches' | 'functions')[] = [
+      'lines',
+      'statements',
+      'branches',
+      'functions'
+    ]
     for (const key of keys) {
       if (diffCoverageData[key].oldPct !== diffCoverageData[key].newPct) {
         return 1
@@ -153,17 +154,19 @@ export class DiffChecker {
     return 0
   }
 
-  private getPercentage(coverageData: CoverageData): number {
-    return coverageData?.pct || 0
+  private getPercentage(coverageData?: CoverageData): number {
+    return coverageData?.pct ?? 0
   }
 
   private getStatusIcon(
     diffFileCoverageData: DiffFileCoverageData
   ): ':green_circle:' | ':red_circle:' {
     let overallDiff = 0
-    Object.values(diffFileCoverageData).forEach(coverageData => {
-      overallDiff = overallDiff + this.getPercentageDiff(coverageData)
-    })
+    Object.values(diffFileCoverageData).forEach(
+      (coverageData: DiffCoverageData) => {
+        overallDiff = overallDiff + this.getPercentageDiff(coverageData)
+      }
+    )
     if (overallDiff < 0) {
       return decreasedCoverageIcon
     }
