@@ -4,10 +4,13 @@
   "private": true,
   "description": "A github action to comment jest coverage diff on a PR",
   "main": "src/main.ts",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "build": "tsc",
-    "format": "prettier --write **/*.ts",
-    "format-check": "prettier --check **/*.ts",
+    "format": "prettier --write \"**/*.ts\"",
+    "format-check": "prettier --check \"**/*.ts\"",
     "lint": "eslint src/**/*.ts",
     "pack": "ncc build",
     "test": "jest",
@@ -15,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anuraag016/Jest-Coverage-Diff"
+    "url": "git+https://github.com/kplates/Jest-Coverage-Diff"
   },
   "keywords": [
     "actions",
@@ -26,22 +29,21 @@
   "author": "Anuraag Puri",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.2.4",
-    "@actions/github": "^4.0.0"
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.1"
   },
   "devDependencies": {
-    "@types/jest": "^24.9.1",
-    "@types/node": "^12.12.50",
-    "@typescript-eslint/parser": "^2.34.0",
-    "@zeit/ncc": "^0.20.5",
-    "eslint": "^5.16.0",
-    "eslint-plugin-github": "^2.0.0",
-    "eslint-plugin-jest": "^22.21.0",
-    "jest": "^24.9.0",
-    "jest-circus": "^24.9.0",
-    "js-yaml": "^3.14.0",
-    "prettier": "^1.19.1",
-    "ts-jest": "^24.3.0",
-    "typescript": "^3.9.6"
+    "@eslint/js": "^9.28.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22.15.21",
+    "@vercel/ncc": "^0.38.4",
+    "eslint": "^9.28.0",
+    "eslint-plugin-jest": "^29.12.2",
+    "globals": "^17.3.0",
+    "jest": "^30.2.0",
+    "prettier": "^3.5.3",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.33.0"
   }
 }

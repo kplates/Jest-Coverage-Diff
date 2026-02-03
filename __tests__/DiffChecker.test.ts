@@ -1,4 +1,4 @@
-import { DiffChecker } from '../src/DiffChecker'
+import {DiffChecker} from '../src/DiffChecker'
 
 describe('DiffChecker', () => {
   const mock100Coverage = {
@@ -43,12 +43,6 @@ describe('DiffChecker', () => {
     functions: mock98Coverage,
     lines: mock98Coverage
   }
-  const mockEmptyCoverageFile = {
-    statements: mockEmptyCoverage,
-    branches: mockEmptyCoverage,
-    functions: mockEmptyCoverage,
-    lines: mockEmptyCoverage
-  }
   it('generates the correct diff', () => {
     const codeCoverageOld = {
       file1: mock99CoverageFile,
@@ -77,9 +71,9 @@ describe('DiffChecker', () => {
       ' :x: | ~~file4~~ | ~~100~~ | ~~100~~ | ~~100~~ | ~~100~~'
     ])
   })
-  describe("testing checkIfTestCoverageFallsBelowDelta", () => {
-    describe("respects total_delta for total and delta for other files", () => {
-      it("returns true because delta diff is too high, even if total_delta is okay", () => {
+  describe('testing checkIfTestCoverageFallsBelowDelta', () => {
+    describe('respects total_delta for total and delta for other files', () => {
+      it('returns true because delta diff is too high, even if total_delta is okay', () => {
         const codeCoverageOld = {
           total: mock100CoverageFile,
           file1: mock100CoverageFile
@@ -89,10 +83,11 @@ describe('DiffChecker', () => {
           file1: mock98CoverageFile
         }
         const diffChecker = new DiffChecker(codeCoverageNew, codeCoverageOld)
-        const isTestCoverageFallsBelowDelta = diffChecker.checkIfTestCoverageFallsBelowDelta(1, 50)
-        expect(isTestCoverageFallsBelowDelta).toBeTruthy();
+        const isTestCoverageFallsBelowDelta =
+          diffChecker.checkIfTestCoverageFallsBelowDelta(1, 50)
+        expect(isTestCoverageFallsBelowDelta).toBeTruthy()
       })
-      it("returns true because total_delta diff is too high, even if delta is okay", () => {
+      it('returns true because total_delta diff is too high, even if delta is okay', () => {
         const codeCoverageOld = {
           total: mock100CoverageFile,
           file1: mock100CoverageFile
@@ -102,10 +97,11 @@ describe('DiffChecker', () => {
           file1: mock98CoverageFile
         }
         const diffChecker = new DiffChecker(codeCoverageNew, codeCoverageOld)
-        const isTestCoverageFallsBelowDelta = diffChecker.checkIfTestCoverageFallsBelowDelta(50, 1)
-        expect(isTestCoverageFallsBelowDelta).toBeTruthy();
+        const isTestCoverageFallsBelowDelta =
+          diffChecker.checkIfTestCoverageFallsBelowDelta(50, 1)
+        expect(isTestCoverageFallsBelowDelta).toBeTruthy()
       })
-      it("returns true if delta diff is too high - total_delta is not defined", () => {
+      it('returns true if delta diff is too high - total_delta is not defined', () => {
         const codeCoverageOld = {
           total: mock100CoverageFile,
           file1: mock100CoverageFile
@@ -115,10 +111,11 @@ describe('DiffChecker', () => {
           file1: mock98CoverageFile
         }
         const diffChecker = new DiffChecker(codeCoverageNew, codeCoverageOld)
-        const isTestCoverageFallsBelowDelta = diffChecker.checkIfTestCoverageFallsBelowDelta(1, null)
-        expect(isTestCoverageFallsBelowDelta).toBeTruthy();
+        const isTestCoverageFallsBelowDelta =
+          diffChecker.checkIfTestCoverageFallsBelowDelta(1, null)
+        expect(isTestCoverageFallsBelowDelta).toBeTruthy()
       })
-      it("returns false if total_delta and delta are okay", () => {
+      it('returns false if total_delta and delta are okay', () => {
         const codeCoverageOld = {
           total: mock100CoverageFile,
           file1: mock100CoverageFile
@@ -128,10 +125,11 @@ describe('DiffChecker', () => {
           file1: mock98CoverageFile
         }
         const diffChecker = new DiffChecker(codeCoverageNew, codeCoverageOld)
-        const isTestCoverageFallsBelowDelta = diffChecker.checkIfTestCoverageFallsBelowDelta(50, 50)
-        expect(isTestCoverageFallsBelowDelta).toBeFalsy();
+        const isTestCoverageFallsBelowDelta =
+          diffChecker.checkIfTestCoverageFallsBelowDelta(50, 50)
+        expect(isTestCoverageFallsBelowDelta).toBeFalsy()
       })
-      it("returns false if delta is okay - total_delta is not defined", () => {
+      it('returns false if delta is okay - total_delta is not defined', () => {
         const codeCoverageOld = {
           total: mock100CoverageFile,
           file1: mock100CoverageFile
@@ -141,54 +139,58 @@ describe('DiffChecker', () => {
           file1: mock98CoverageFile
         }
         const diffChecker = new DiffChecker(codeCoverageNew, codeCoverageOld)
-        const isTestCoverageFallsBelowDelta = diffChecker.checkIfTestCoverageFallsBelowDelta(50, null)
-        expect(isTestCoverageFallsBelowDelta).toBeFalsy();
+        const isTestCoverageFallsBelowDelta =
+          diffChecker.checkIfTestCoverageFallsBelowDelta(50, null)
+        expect(isTestCoverageFallsBelowDelta).toBeFalsy()
       })
     })
-    it("detects that total coverage dropped below total_delta", () => {
+    it('detects that total coverage dropped below total_delta', () => {
       const codeCoverageOld = {
-        total: mock100CoverageFile,
+        total: mock100CoverageFile
       }
       const codeCoverageNew = {
-        total: mock98CoverageFile,
+        total: mock98CoverageFile
       }
       const diffChecker = new DiffChecker(codeCoverageNew, codeCoverageOld)
-      const isTestCoverageFallsBelowDelta = diffChecker.checkIfTestCoverageFallsBelowDelta(2, 1)
-      expect(isTestCoverageFallsBelowDelta).toBeTruthy();
+      const isTestCoverageFallsBelowDelta =
+        diffChecker.checkIfTestCoverageFallsBelowDelta(2, 1)
+      expect(isTestCoverageFallsBelowDelta).toBeTruthy()
     })
-    it("detects that total coverage did not drop below total_delta", () => {
+    it('detects that total coverage did not drop below total_delta', () => {
       const codeCoverageOld = {
-        total: mock100CoverageFile,
+        total: mock100CoverageFile
       }
       const codeCoverageNew = {
-        total: mock98CoverageFile,
+        total: mock98CoverageFile
       }
       const diffChecker = new DiffChecker(codeCoverageNew, codeCoverageOld)
-      const isTestCoverageFallsBelowDelta = diffChecker.checkIfTestCoverageFallsBelowDelta(1, 5)
-      expect(isTestCoverageFallsBelowDelta).toBeFalsy();
+      const isTestCoverageFallsBelowDelta =
+        diffChecker.checkIfTestCoverageFallsBelowDelta(1, 5)
+      expect(isTestCoverageFallsBelowDelta).toBeFalsy()
     })
-    it("detects that total coverage dropped below delta", () => {
+    it('detects that total coverage dropped below delta', () => {
       const codeCoverageOld = {
-        total: mock100CoverageFile,
+        total: mock100CoverageFile
       }
       const codeCoverageNew = {
-        total: mock98CoverageFile,
+        total: mock98CoverageFile
       }
       const diffChecker = new DiffChecker(codeCoverageNew, codeCoverageOld)
-      const isTestCoverageFallsBelowDelta = diffChecker.checkIfTestCoverageFallsBelowDelta(1, null)
-      expect(isTestCoverageFallsBelowDelta).toBeTruthy();
+      const isTestCoverageFallsBelowDelta =
+        diffChecker.checkIfTestCoverageFallsBelowDelta(1, null)
+      expect(isTestCoverageFallsBelowDelta).toBeTruthy()
     })
-    it("detects that total coverage did not drop below delta", () => {
+    it('detects that total coverage did not drop below delta', () => {
       const codeCoverageOld = {
-        total: mock100CoverageFile,
+        total: mock100CoverageFile
       }
       const codeCoverageNew = {
-        total: mock98CoverageFile,
+        total: mock98CoverageFile
       }
       const diffChecker = new DiffChecker(codeCoverageNew, codeCoverageOld)
-      const isTestCoverageFallsBelowDelta = diffChecker.checkIfTestCoverageFallsBelowDelta(2, null)
-      expect(isTestCoverageFallsBelowDelta).toBeFalsy();
+      const isTestCoverageFallsBelowDelta =
+        diffChecker.checkIfTestCoverageFallsBelowDelta(2, null)
+      expect(isTestCoverageFallsBelowDelta).toBeFalsy()
     })
-
   })
 })

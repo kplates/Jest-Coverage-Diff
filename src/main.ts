@@ -4,9 +4,8 @@ import {execSync} from 'child_process'
 import fs from 'fs'
 import {CoverageReport} from './Model/CoverageReport'
 import {DiffChecker} from './DiffChecker'
-import {Octokit} from '@octokit/core'
-import {PaginateInterface} from '@octokit/plugin-paginate-rest'
-import {RestEndpointMethods} from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types'
+
+type GitHubClient = ReturnType<typeof github.getOctokit>
 
 async function run(): Promise<void> {
   try {
@@ -32,9 +31,9 @@ async function run(): Promise<void> {
     }
     let commentId = null
     execSync(commandToRun)
-    const codeCoverageNew = <CoverageReport>(
-      JSON.parse(fs.readFileSync('coverage-summary.json').toString())
-    )
+    const codeCoverageNew = JSON.parse(
+      fs.readFileSync('coverage-summary.json').toString()
+    ) as CoverageReport
     execSync('/usr/bin/git fetch')
     execSync('/usr/bin/git stash')
     execSync(`/usr/bin/git checkout --progress --force ${branchNameBase}`)
@@ -42,12 +41,10 @@ async function run(): Promise<void> {
       execSync(commandAfterSwitch)
     }
     execSync(commandToRun)
-    const codeCoverageOld = <CoverageReport>(
-      JSON.parse(fs.readFileSync('coverage-summary.json').toString())
-    )
-    const currentDirectory = execSync('pwd')
-      .toString()
-      .trim()
+    const codeCoverageOld = JSON.parse(
+      fs.readFileSync('coverage-summary.json').toString()
+    ) as CoverageReport
+    const currentDirectory = execSync('pwd').toString().trim()
     const diffChecker: DiffChecker = new DiffChecker(
       codeCoverageNew,
       codeCoverageOld
@@ -109,28 +106,31 @@ async function run(): Promise<void> {
       throw Error(messageToPost)
     }
   } catch (error) {
-    core.setFailed(error)
+    if (error instanceof Error) {
+      core.setFailed(error.message)
+    } else {
+      core.setFailed(String(error))
+    }
   }
 }
 
 async function createOrUpdateComment(
   commentId: number | null,
-  githubClient: {[x: string]: any} & {[x: string]: any} & Octokit &
-    RestEndpointMethods & {paginate: PaginateInterface},
+  githubClient: GitHubClient,
   repoOwner: string,
   repoName: string,
   messageToPost: string,
   prNumber: number
-) {
+): Promise<void> {
   if (commentId) {
-    await githubClient.issues.updateComment({
+    await githubClient.rest.issues.updateComment({
       owner: repoOwner,
       repo: repoName,
       comment_id: commentId,
       body: messageToPost
     })
   } else {
-    await githubClient.issues.createComment({
+    await githubClient.rest.issues.createComment({
       repo: repoName,
       owner: repoOwner,
       body: messageToPost,
@@ -140,25 +140,24 @@ async function createOrUpdateComment(
 }
 
 async function findComment(
-  githubClient: {[x: string]: any} & {[x: string]: any} & Octokit &
-    RestEndpointMethods & {paginate: PaginateInterface},
+  githubClient: GitHubClient,
   repoName: string,
   repoOwner: string,
   prNumber: number,
   identifier: string
-): Promise<number> {
-  const comments = await githubClient.issues.listComments({
+): Promise<number | null> {
+  const comments = await githubClient.rest.issues.listComments({
     owner: repoOwner,
     repo: repoName,
     issue_number: prNumber
   })
 
   for (const comment of comments.data) {
-    if (comment.body.startsWith(identifier)) {
+    if (comment.body?.startsWith(identifier)) {
       return comment.id
     }
   }
-  return 0
+  return null
 }
 
 run()
