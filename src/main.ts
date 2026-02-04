@@ -12,6 +12,21 @@ interface PullRequestPayload {
   head: {ref: string}
 }
 
+function execCommand(command: string): void {
+  core.info(`Running: ${command}`)
+  execSync(command, {
+    encoding: 'utf-8',
+    stdio: 'inherit'
+  })
+}
+
+function execCommandOutput(command: string): string {
+  core.info(`Running: ${command}`)
+  return execSync(command, {
+    encoding: 'utf-8'
+  })
+}
+
 async function run(): Promise<void> {
   try {
     const repoName = github.context.repo.repo
@@ -38,21 +53,21 @@ async function run(): Promise<void> {
       totalDelta = Number(rawTotalDelta)
     }
     let commentId = null
-    execSync(commandToRun)
+    execCommand(commandToRun)
     const codeCoverageNew = JSON.parse(
       fs.readFileSync('coverage-summary.json').toString()
     ) as CoverageReport
-    execSync('/usr/bin/git fetch')
-    execSync('/usr/bin/git stash')
-    execSync(`/usr/bin/git checkout --progress --force ${branchNameBase}`)
+    execCommand('git fetch')
+    execCommand('git stash')
+    execCommand(`git checkout --progress --force ${branchNameBase}`)
     if (commandAfterSwitch) {
-      execSync(commandAfterSwitch)
+      execCommand(commandAfterSwitch)
     }
-    execSync(commandToRun)
+    execCommand(commandToRun)
     const codeCoverageOld = JSON.parse(
       fs.readFileSync('coverage-summary.json').toString()
     ) as CoverageReport
-    const currentDirectory = execSync('pwd').toString().trim()
+    const currentDirectory = execCommandOutput('pwd').trim()
     const diffChecker: DiffChecker = new DiffChecker(
       codeCoverageNew,
       codeCoverageOld
