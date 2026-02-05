@@ -5,14 +5,14 @@
   "description": "A github action to comment jest coverage diff on a PR",
   "main": "src/main.ts",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=20.0.0"
   },
   "scripts": {
     "build": "tsc",
     "format": "prettier --write \"**/*.ts\"",
     "format-check": "prettier --check \"**/*.ts\"",
     "lint": "eslint src/**/*.ts",
-    "pack": "esbuild lib/main.js --bundle --platform=node --target=node22 --minify --outfile=dist/index.js",
+    "pack": "esbuild lib/main.js --bundle --platform=node --target=node20 --minify --outfile=dist/index.js",
     "test": "jest",
     "all": "npm run build && npm run format && npm run lint && npm run pack && npm test"
   },
